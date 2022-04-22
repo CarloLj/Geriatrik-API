@@ -37,6 +37,19 @@ getPatients = function(){
   )
 }
 
+addPatient = function(nombre, apellidoP, apellidoM, fechaNac, sexo, escolaridad, discapacidades, queja_memoria, hipoacusia_severa, contactoEmergencia, imagenPerfil) {
+    return new Promise(function(resolve, reject){
+        con.query(
+            "INSERT INTO * Paciente VALUES ("+nombre+", "+apellidoP+", "+apellidoM+", "+fechaNac+", "+sexo+", "+escolaridad+", "+discapacidades+", "
+            +", "+queja_memoria+", " + hipoacusia_severa+", "+contactoEmergencia+", "+imagenPerfil+"", function (err, rows, fields) {                                                
+              if (err) throw err
+              results = Object.values(JSON.parse(JSON.stringify(rows)));
+              resolve(results);  
+            }
+        )}
+    )
+}
+
 const swaggerSpec = {
     definition: {
         openapi: "3.0.0",
@@ -134,3 +147,64 @@ app.get("/patients", (req, res) => {
         res.json({message: results});
     });
 });
+
+//CREATE
+app.post("/addPatient", (req, res) => {
+    addPatient().then(
+        function(results){
+        console.log(results)
+        res.json({message: results});
+    });
+});
+
+
+app.post("/addPatient", (req, res) => {
+        const { nombre, apellidoP, apellidoM, fechaNac, sexo, escolaridad, discapacidades, queja_memoria, hipoacusia_severa, contactoEmergencia, imagenPerfil } = req.body;
+  
+        const newPatient = {
+          nombre: nombre,
+          apellidoP: apellidoP,
+          apellidoM: apellidoM,
+          fechaNac: fechaNac,
+          sexo: sexo,
+          escolaridad: escolaridad,
+          discapacidades: discapacidades,
+          queja_memoria: queja_memoria,
+          hipoacusia_severa: hipoacusia_severa,
+          contactoEmergencia: contactoEmergencia,
+          imagenPerfil: imagenPerfil
+        };
+
+        console.log(data);
+  
+        let newjson = JSON.stringify(data, null, "\t");
+  
+
+        con.query(
+            "INSERT INTO * Paciente VALUES ("+nombre+", "+apellidoP+", "+apellidoM+", "+fechaNac+", "+sexo+", "+escolaridad+", "+discapacidades+", "
+            +", "+queja_memoria+", " + hipoacusia_severa+", "+contactoEmergencia+", "+imagenPerfil
+              }
+          )}
+
+
+
+
+
+
+        fs.writeFile(__dirname + "/" + "pets.json", newjson, (err) => {
+          // error checking
+          if (err) {
+            console.log(err.message);
+            // res.sendStatus(500);
+          } else {
+            // res.sendStatus(200);
+            console.log("New data added");
+          }
+        });
+        res.end(JSON.stringify(data));
+      } catch(error) {
+        console.log(error)
+        console.log("error");
+      }
+    });
+  });
