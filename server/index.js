@@ -4,75 +4,111 @@ const express = require("express");
 const PORT = process.env.PORT || 3001;
 
 const fs = require("fs");
-const bp = require('body-parser');
+const bp = require("body-parser");
 const path = require("path");
 
-const swaggerUI = require('swagger-ui-express');
-const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUI = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
 
-
-var mysql = require('mysql');
+var mysql = require("mysql");
 
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "geriatrik"
+  database: "geriatrik",
 });
 
-con.connect(function(err) {
+con.connect(function (err) {
   if (err) throw err;
   console.log("Geriatrik database connection succesful!");
 });
 
-getPatients = function(){
-    return new Promise(function(resolve, reject){
-      con.query(
-        "SELECT * FROM paciente", function (err, rows, fields) {                                                
-            if (err) throw err
-            results = Object.values(JSON.parse(JSON.stringify(rows)));
-            resolve(results);  
-          }
-      )}
-  )
-}
+getPatients = function () {
+  return new Promise(function (resolve, reject) {
+    con.query("SELECT * FROM paciente", function (err, rows, fields) {
+      if (err) throw err;
+      results = Object.values(JSON.parse(JSON.stringify(rows)));
+      resolve(results);
+    });
+  });
+};
 
-addPatient = function(nombre, apellidoP, apellidoM, fechaNac, sexo, escolaridad, discapacidades, queja_memoria, hipoacusia_severa, contactoEmergencia, imagenPerfil) {
-    return new Promise(function(resolve, reject){
-        con.query(
-            "INSERT INTO * Paciente VALUES ("+nombre+", "+apellidoP+", "+apellidoM+", "+fechaNac+", "+sexo+", "+escolaridad+", "+discapacidades+", "
-            +", "+queja_memoria+", " + hipoacusia_severa+", "+contactoEmergencia+", "+imagenPerfil+"", function (err, rows, fields) {                                                
-              if (err) throw err
-              results = Object.values(JSON.parse(JSON.stringify(rows)));
-              resolve(results);  
-            }
-        )}
-    )
-}
+addPatient = function (
+  nombre,
+  apellidoP,
+  apellidoM,
+  fechaNac,
+  sexo,
+  escolaridad,
+  discapacidades,
+  queja_memoria,
+  hipoacusia_severa,
+  contactoEmergencia,
+  imagenPerfil
+) {
+  return new Promise(function (resolve, reject) {
+    con.query(
+      "INSERT INTO * Paciente VALUES (" +
+        nombre +
+        ", " +
+        apellidoP +
+        ", " +
+        apellidoM +
+        ", " +
+        fechaNac +
+        ", " +
+        sexo +
+        ", " +
+        escolaridad +
+        ", " +
+        discapacidades +
+        ", " +
+        ", " +
+        queja_memoria +
+        ", " +
+        hipoacusia_severa +
+        ", " +
+        contactoEmergencia +
+        ", " +
+        imagenPerfil +
+        "",
+      function (err, rows, fields) {
+        if (err) throw err;
+        results = Object.values(JSON.parse(JSON.stringify(rows)));
+        resolve(results);
+      }
+    );
+  });
+};
 
 const swaggerSpec = {
-    definition: {
-        openapi: "3.0.0",
-        info: {
-            title: "CARS API - CARLO LUJAN",
-            version: "1.0.0"
-        },
-        servers: [
-            {
-                url: `http://localhost:${PORT}`
-            }
-        ]
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "CARS API - CARLO LUJAN",
+      version: "1.0.0",
     },
-    apis:[`${path.join(__dirname, "./index.js")}`]
-}
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+      },
+    ],
+  },
+  apis: [`${path.join(__dirname, "./index.js")}`],
+};
 
-const app = express ();
+const app = express();
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
-app.use("/api-doc", swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(swaggerSpec)));
+app.use(
+  "/api-doc",
+  swaggerUI.serve,
+  swaggerUI.setup(swaggerJsDoc(swaggerSpec))
+);
 
 app.listen(PORT, () => {
-    console.log(`Server listening on ${PORT}`);
+  console.log(`Server listening on ${PORT}`);
 });
 
 /**
@@ -99,27 +135,26 @@ app.listen(PORT, () => {
  *                  description: Fecha de naciemiento del paciente
  *              sexo:
  *                  type: string
- *                  description: Apellido materno del paciente 
+ *                  description: Apellido materno del paciente
  *              escolaridad:
  *                  type: string
- *                  description: Apellido materno del paciente 
+ *                  description: Apellido materno del paciente
  *              discapacidades:
  *                  type: string
- *                  description: Apellido materno del paciente 
+ *                  description: Apellido materno del paciente
  *              quejaMemoria:
  *                  type: bool
  *                  description: Apellido materno del paciente
  *              hipoacusia_severa:
  *                  type: bool
- *                  description: Apellido materno del paciente  
+ *                  description: Apellido materno del paciente
  *              contactoEmergencia:
  *                  type: int
- *                  description: Apellido materno del paciente 
+ *                  description: Apellido materno del paciente
  *              imagenPerfil:
  *                  type: string
- *                  description: Apellido materno del paciente  
-*/
-
+ *                  description: Apellido materno del paciente
+ */
 
 /**
  * @swagger
@@ -129,8 +164,8 @@ app.listen(PORT, () => {
  *        - "Api"
  *      summary: Retorna un mensaje de informacion del api
  */
-app.get("/api-info", (req,res) => {
-    res.json({message: "API version 0.1"});
+app.get("/api-info", (req, res) => {
+  res.json({ message: "API version 0.1" });
 });
 
 /**
@@ -141,70 +176,16 @@ app.get("/api-info", (req,res) => {
  *      tags: [Patient]
  */
 app.get("/patients", (req, res) => {
-    getPatients().then(
-        function(results){
-        console.log(results)
-        res.json({message: results});
-    });
+  getPatients().then(function (results) {
+    console.log(results);
+    res.json({ message: results });
+  });
 });
 
 //CREATE
 app.post("/addPatient", (req, res) => {
-    addPatient().then(
-        function(results){
-        console.log(results)
-        res.json({message: results});
-    });
-});
-
-
-app.post("/addPatient", (req, res) => {
-        const { nombre, apellidoP, apellidoM, fechaNac, sexo, escolaridad, discapacidades, queja_memoria, hipoacusia_severa, contactoEmergencia, imagenPerfil } = req.body;
-  
-        const newPatient = {
-          nombre: nombre,
-          apellidoP: apellidoP,
-          apellidoM: apellidoM,
-          fechaNac: fechaNac,
-          sexo: sexo,
-          escolaridad: escolaridad,
-          discapacidades: discapacidades,
-          queja_memoria: queja_memoria,
-          hipoacusia_severa: hipoacusia_severa,
-          contactoEmergencia: contactoEmergencia,
-          imagenPerfil: imagenPerfil
-        };
-
-        console.log(data);
-  
-        let newjson = JSON.stringify(data, null, "\t");
-  
-
-        con.query(
-            "INSERT INTO * Paciente VALUES ("+nombre+", "+apellidoP+", "+apellidoM+", "+fechaNac+", "+sexo+", "+escolaridad+", "+discapacidades+", "
-            +", "+queja_memoria+", " + hipoacusia_severa+", "+contactoEmergencia+", "+imagenPerfil
-              }
-          )}
-
-
-
-
-
-
-        fs.writeFile(__dirname + "/" + "pets.json", newjson, (err) => {
-          // error checking
-          if (err) {
-            console.log(err.message);
-            // res.sendStatus(500);
-          } else {
-            // res.sendStatus(200);
-            console.log("New data added");
-          }
-        });
-        res.end(JSON.stringify(data));
-      } catch(error) {
-        console.log(error)
-        console.log("error");
-      }
-    });
+  addPatient().then(function (results) {
+    console.log(results);
+    res.json({ message: results });
   });
+});
