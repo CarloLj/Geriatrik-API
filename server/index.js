@@ -25,10 +25,10 @@ con.connect(function(err) {
   console.log("Geriatrik database connection succesful!");
 });
 
-getAsentamientos = function(){
+getPatients = function(){
     return new Promise(function(resolve, reject){
       con.query(
-        "SELECT * FROM pacientes", function (err, rows, fields) {                                                
+        "SELECT * FROM paciente", function (err, rows, fields) {                                                
             if (err) throw err
             results = Object.values(JSON.parse(JSON.stringify(rows)));
             resolve(results);  
@@ -69,22 +69,43 @@ app.listen(PORT, () => {
  *      Patient:
  *          type: object
  *          properties:
- *              name:
+ *              pacienteID:
  *                  type: string
- *                  description: Nombre del carro
- *              type:
+ *                  description: Identificador unico del paciente
+ *              nombre:
  *                  type: string
- *                  description: Marca del carro
- *              owner:
+ *                  description: Nombre del paciente
+ *              apellidoP:
  *                  type: string
- *                  description: Dueño del carro
- *              color:
+ *                  description: Apellido paterno del paciente
+ *              apellidoM:
  *                  type: string
- *                  description: Color del carro
- *              id:
- *                  type: integer
- *                  description: Identificador unico del carro
- */
+ *                  description: Apellido materno del paciente
+ *              fechaNac:
+ *                  type: date
+ *                  description: Fecha de naciemiento del paciente
+ *              sexo:
+ *                  type: string
+ *                  description: Apellido materno del paciente 
+ *              escolaridad:
+ *                  type: string
+ *                  description: Apellido materno del paciente 
+ *              discapacidades:
+ *                  type: string
+ *                  description: Apellido materno del paciente 
+ *              quejaMemoria:
+ *                  type: bool
+ *                  description: Apellido materno del paciente
+ *              hipoacusia_severa:
+ *                  type: bool
+ *                  description: Apellido materno del paciente  
+ *              contactoEmergencia:
+ *                  type: int
+ *                  description: Apellido materno del paciente 
+ *              imagenPerfil:
+ *                  type: string
+ *                  description: Apellido materno del paciente  
+*/
 
 
 /**
@@ -107,7 +128,7 @@ app.get("/api-info", (req,res) => {
  *      tags: [Patient]
  */
 app.get("/patients", (req, res) => {
-    getAsentamientos().then(
+    getPatients().then(
         function(results){
         console.log(results)
         res.json({message: results});
