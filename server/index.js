@@ -86,8 +86,8 @@ const swaggerSpec = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "CARS API - CARLO LUJAN",
-      version: "1.0.0",
+      title: "GERIATRIK API",
+      version: "0.1.0",
     },
     servers: [
       {
