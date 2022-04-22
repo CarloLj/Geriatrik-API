@@ -1,0 +1,24 @@
+{
+  "name": "geriatrik-api",
+  "version": "1.0.0",
+  "description": "Geriatrik Web app API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CarloLj/Geriatrik-API.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CarloLj/Geriatrik-API/issues"
+  },
+  "homepage": "https://github.com/CarloLj/Geriatrik-API#readme",
+  "dependencies": {
+    "swagger": "^0.7.5"
+  }
+}
