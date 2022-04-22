@@ -170,7 +170,7 @@ app.get("/api-info", (req, res) => {
 
 /**
  * @swagger
- * /cars:
+ * /patients:
  *  get:
  *      summary: Retorna la lista de la base de datos de pacientes en el servidor
  *      tags: [Patient]
