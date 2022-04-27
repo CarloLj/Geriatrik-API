@@ -82,6 +82,32 @@ addPatient = function (
   });
 };
 
+addEmployee = function (nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont){
+  con.query("INSERT INTO empleado (nombre,apellidoP,apellidoM,fechaNac,tipoEmpleado,sexo,cedula,email,password,imagenPerfil) VALUES ('" +
+    nombre +
+    "', '" +
+    apellidoP +
+    "', '" +
+    apellidoM +
+    "', " +
+    fechaNac +
+    ", " +
+    tipo +
+    ", '"+
+    sexo +
+    "', '" +
+    cedula +
+    "', '" +
+    email +
+    "', '" +
+    cont + "','');"),
+    function (err, rows, fields) {
+      if (err) throw err;
+      results = Object.values(JSON.parse(JSON.stringify(rows)));
+      resolve(results);
+    }
+};
+
 const swaggerSpec = {
   definition: {
     openapi: "3.0.0",
@@ -99,6 +125,7 @@ const swaggerSpec = {
 };
 
 const app = express();
+app.use(express.json());
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 app.use(
@@ -185,6 +212,14 @@ app.get("/patients", (req, res) => {
 //CREATE
 app.post("/addPatient", (req, res) => {
   addPatient().then(function (results) {
+    console.log(results);
+    res.json({ message: results });
+  });
+});
+
+app.post("/register", (req,res) => {
+  const {nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont} = req.body;
+  addEmployee(nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont).then(function (results){
     console.log(results);
     res.json({ message: results });
   });
