@@ -1,3 +1,4 @@
+
 // server-index.js
 const express = require("express");
 
@@ -83,29 +84,25 @@ addPatient = function (
 };
 
 addEmployee = function (nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont){
-  con.query("INSERT INTO empleado (nombre,apellidoP,apellidoM,fechaNac,tipoEmpleado,sexo,cedula,email,password,imagenPerfil) VALUES ('" +
-    nombre +
-    "', '" +
-    apellidoP +
-    "', '" +
-    apellidoM +
-    "', " +
-    fechaNac +
-    ", " +
-    tipo +
-    ", '"+
-    sexo +
-    "', '" +
-    cedula +
-    "', '" +
-    email +
-    "', '" +
-    cont + "','');"),
-    function (err, rows, fields) {
-      if (err) throw err;
-      results = Object.values(JSON.parse(JSON.stringify(rows)));
-      resolve(results);
-    }
+  return new Promise(function (resolve, reject) {
+    con.query("INSERT INTO empleado (nombre,apellidoP,apellidoM,fechaNac,tipoEmpleado,sexo,cedula,email,password,imagenPerfil)"+
+      "SELECT * FROM (SELECT '"+
+      nombre+"', '"+
+      apellidoP+"', '"+
+      apellidoM+"', '"+
+      fechaNac+"', "+
+      tipo+", '"+
+      sexo+"', '"+
+      cedula+"', '"+
+      email+"', '"+
+      cont+"','none')"+
+      "as tmp WHERE NOT EXISTS ( SELECT email FROM empleado WHERE email = '" +email+ "') LIMIT 1",
+      function (err, results) {
+        if (err) throw err;
+        resolve(results);
+      }
+    )
+  });
 };
 
 const swaggerSpec = {
@@ -223,4 +220,5 @@ app.post("/register", (req,res) => {
     console.log(results);
     res.json({ message: results });
   });
+  //res.json({message:"Success"});
 });
