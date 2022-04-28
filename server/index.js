@@ -1,3 +1,4 @@
+
 // server-index.js
 const express = require("express");
 
@@ -6,7 +7,8 @@ const PORT = process.env.PORT || 3001;
 const fs = require("fs");
 const bp = require("body-parser");
 const path = require("path");
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 
@@ -82,6 +84,28 @@ addPatient = function (
   });
 };
 
+addEmployee = function (nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont){
+  return new Promise(function (resolve, reject) {
+    con.query("INSERT INTO empleado (nombre,apellidoP,apellidoM,fechaNac,tipoEmpleado,sexo,cedula,email,password,imagenPerfil)"+
+      "SELECT * FROM (SELECT '"+
+      nombre+"', '"+
+      apellidoP+"', '"+
+      apellidoM+"', '"+
+      fechaNac+"', "+
+      tipo+", '"+
+      sexo+"', '"+
+      cedula+"', '"+
+      email+"', '"+
+      cont+"','none')"+
+      "as tmp WHERE NOT EXISTS ( SELECT email FROM empleado WHERE email = '" +email+ "') LIMIT 1",
+      function (err, results) {
+        if (err) throw err;
+        resolve(results);
+      }
+    )
+  });
+};
+
 const swaggerSpec = {
   definition: {
     openapi: "3.0.0",
@@ -99,6 +123,7 @@ const swaggerSpec = {
 };
 
 const app = express();
+app.use(express.json());
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 app.use(
@@ -188,4 +213,40 @@ app.post("/addPatient", (req, res) => {
     console.log(results);
     res.json({ message: results });
   });
+});
+
+app.post("/register", async (req,res) => {
+  const {nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont} = req.body;
+  
+  try {
+    //encriptado de la contraseña
+    const salt = await bcrypt.genSalt(10); 
+    password = await bcrypt.hash(cont,salt);
+
+    addEmployee(nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,password).then(function (results){
+      
+      if(results["affectedRows"] != 0){
+        //payload to send in jwt
+        const payload = {
+          user: {
+              cedula: cedula
+          }
+        }
+
+        //sign the jwt to ensure it hasn't been altered, sign uses payload and secret
+        jwt.sign(payload,"secret",{
+          expiresIn: 3600
+        },(err,token) => {
+            //return generated jwt
+            if(err) throw err;
+            res.json({token});
+        });
+      }else{
+        res.json({message: "User already exists"});
+      }
+    });
+  } catch (error) {
+    res.status(500).send('Server error');
+  }
+  
 });
