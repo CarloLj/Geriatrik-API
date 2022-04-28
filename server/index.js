@@ -7,7 +7,8 @@ const PORT = process.env.PORT || 3001;
 const fs = require("fs");
 const bp = require("body-parser");
 const path = require("path");
-
+const bcrypt = require('bcryptjs/dist/bcrypt');
+const jwt = require('jsonwebtoken');
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 
@@ -216,9 +217,38 @@ app.post("/addPatient", (req, res) => {
 
 app.post("/register", (req,res) => {
   const {nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont} = req.body;
-  addEmployee(nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont).then(function (results){
-    console.log(results);
-    res.json({ message: results });
-  });
-  //res.json({message:"Success"});
+
+  //encriptado de la contraseña
+  const salt = await bcrypt.genSalt(10); 
+  cont = await bcrypt.hash(password,salt);
+  
+  try {
+    addEmployee(nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont).then(function (results){
+      console.log(results);
+      res.json({ message: results });
+
+      if(results[affectetRows] != 0){
+        //payload to send in jwt
+        const payload = {
+          user: {
+              cedula: cedula
+          }
+        }
+
+        //sign the jwt to ensure it hasn't been altered, sign uses payload and secret
+        jwt.sign(payload,config.get('jwtSecret'),{
+          expiresIn: 3600
+        },(err,token) => {
+            //return generated jwt
+            if(err) throw err;
+            res.json({token});
+        });
+      }else{
+        res.json({message: "User already exists"});
+      } 
+    });
+  } catch (error) {
+    res.status(500).send('Server error');
+  }
+  
 });
