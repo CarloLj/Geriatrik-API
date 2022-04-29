@@ -106,6 +106,17 @@ addEmployee = function (nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,em
   });
 };
 
+getUser = function (email){
+  return new Promise(function (resolve, reject) {
+    con.query("SELECT empleadoID, nombre, cedula,password FROM empleado WHERE email = '"+ email+"';",
+      function (err, results) {
+        if (err) throw err;
+        resolve(results);
+      }
+    )
+  });
+};
+
 const swaggerSpec = {
   definition: {
     openapi: "3.0.0",
@@ -179,6 +190,42 @@ app.listen(PORT, () => {
  *              imagenPerfil:
  *                  type: string
  *                  description: Apellido materno del paciente
+ *      Employee:
+ *        type: object
+ *        properties:
+ *              empleadoID:
+ *                  type: int
+ *                  description: Identificador unico del empleado
+ *              nombre:
+ *                  type: string
+ *                  description: Nombre del empleado
+ *              apellidoP:
+ *                  type: string
+ *                  description: Apellido paterno del empleado
+ *              apellidoM:
+ *                  type: string
+ *                  description: Apellido materno del empleado
+ *              fechaNac:
+ *                  type: date
+ *                  description: Fecha de naciemiento del empleado
+ *              tipoEmpleado:
+ *                  type: int
+ *                  description: Tipo de empleado
+ *              sexo:
+ *                  type: string
+ *                  description: Apellido materno del empleado
+ *              cedula:
+ *                  type: string
+ *                  description: Cedula profesional del empleado
+ *              email:
+ *                  type: string
+ *                  description: Correo electróncio del empleado
+ *              password:
+ *                  type: bool
+ *                  description: Contraseña del empleado
+ *              imagenPerfil:
+ *                  type: string
+ *                  description: Apellido materno del empleado
  */
 
 /**
@@ -215,6 +262,14 @@ app.post("/addPatient", (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /register:
+ *  post:
+ *      summary: Ingresa datos del empleado en la BD y retorna su nombre, ID y token de acceso
+ *      tags: [Employee]
+ */
+
 app.post("/register", async (req,res) => {
   const {nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont} = req.body;
   
@@ -239,7 +294,15 @@ app.post("/register", async (req,res) => {
         },(err,token) => {
             //return generated jwt
             if(err) throw err;
-            res.json({token});
+
+            getUser(email).then(function(results){
+              const User = {
+                empleadoID: results[0]["empleadoID"],
+                name: nombre,
+                token: token
+              }
+              res.json(User);
+            });
         });
       }else{
         res.json({message: "User already exists"});
@@ -249,4 +312,57 @@ app.post("/register", async (req,res) => {
     res.status(500).send('Server error');
   }
   
+});
+
+/**
+ * @swagger
+ * /login:
+ *  post:
+ *      summary: Revisa las credenciales del usuario y retorna su ID, nombre y token de acceso
+ *      tags: [Employee]
+ */
+
+app.post("/login", (req, res) => {
+  const {email,cont} = req.body;
+  try {
+    getUser(email).then(async function (results){
+      if(results.length != 0){
+
+        //checks if passwords match 
+        const isMatch = await bcrypt.compare(cont,results[0]["password"]);
+
+        if(!isMatch){
+          res.status(400).json({msg: 'Invalid Credentials'});
+        }
+
+        const payload = {
+          user: {
+              cedula: results[0]["cedula"]
+          }
+        }
+
+        //sign the jwt to ensure it hasn't been altered, sign uses payload and secret
+        jwt.sign(payload,"secret",{
+          expiresIn: 3600
+        },(err,token) => {
+            //return generated jwt
+            if(err) throw err;
+
+            const User = {
+              empleadoID: results[0]["empleadoID"],
+              name: results[0]["nombre"],
+              token: token
+            }
+
+            console.log(User);
+
+            res.json(User);
+        });        
+      }else{
+        res.json({message: "User does not exist"});
+      }
+    })
+  } catch (error) {
+    res.status(500).send('Server error');
+  }
 });
