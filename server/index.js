@@ -271,15 +271,18 @@ app.post("/addPatient", (req, res) => {
  */
 
 app.post("/register", async (req,res) => {
+  //destructure body
   const {nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont} = req.body;
   
   try {
-    //encriptado de la contraseña
+    //password hashing
     const salt = await bcrypt.genSalt(10); 
     password = await bcrypt.hash(cont,salt);
 
+    //insert query
     addEmployee(nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,password).then(function (results){
       
+      //if insert query was successfull
       if(results["affectedRows"] != 0){
         //payload to send in jwt
         const payload = {
@@ -295,12 +298,14 @@ app.post("/register", async (req,res) => {
             //return generated jwt
             if(err) throw err;
 
+            //get new userID
             getUser(email).then(function(results){
               const User = {
                 empleadoID: results[0]["empleadoID"],
                 name: nombre,
                 token: token
               }
+              //return user data and access token
               res.json(User);
             });
         });
@@ -325,7 +330,9 @@ app.post("/register", async (req,res) => {
 app.post("/login", (req, res) => {
   const {email,cont} = req.body;
   try {
+    //find user by email
     getUser(email).then(async function (results){
+      //if user is found
       if(results.length != 0){
 
         //checks if passwords match 
@@ -334,7 +341,8 @@ app.post("/login", (req, res) => {
         if(!isMatch){
           res.status(400).json({msg: 'Invalid Credentials'});
         }
-
+        
+        //payload to send in jwt
         const payload = {
           user: {
               cedula: results[0]["cedula"]
@@ -353,9 +361,8 @@ app.post("/login", (req, res) => {
               name: results[0]["nombre"],
               token: token
             }
-
-            console.log(User);
-
+            
+            //return user data and access token
             res.json(User);
         });        
       }else{
