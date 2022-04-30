@@ -19,6 +19,7 @@ var con = mysql.createConnection({
   user: "root",
   password: "",
   database: "geriatrik",
+  port: 3308
 });
 
 con.connect(function (err) {
@@ -114,6 +115,27 @@ getUser = function (email){
         resolve(results);
       }
     )
+  });
+};
+
+getTamizaje = function (pacienteID){
+  return new Promise(function (resolve, reject) {
+    con.query("SELECT fecha, respuestasJSON, puntos, tipotamizaje.tipo from tamizaje INNER JOIN tipotamizaje where tipotamizaje.tipoID = tipoTamizaje and pacienteID = '" + pacienteID+"';",
+      function (err, results) {
+        if (err) throw err;
+        resolve(results);
+      }
+    )
+  });
+};
+
+getPatients = function () {
+  return new Promise(function (resolve, reject) {
+    con.query("SELECT * FROM paciente", function (err, rows, fields) {
+      if (err) throw err;
+      results = Object.values(JSON.parse(JSON.stringify(rows)));
+      resolve(results);
+    });
   });
 };
 
@@ -249,6 +271,15 @@ app.get("/api-info", (req, res) => {
  */
 app.get("/patients", (req, res) => {
   getPatients().then(function (results) {
+    console.log(results);
+    res.json({ message: results });
+  });
+});
+
+app.get("/tamizaje", (req, res) => {
+  const {pacienteID} = req.body;
+  console.log(pacienteID);
+  getTamizaje(pacienteID).then(function (results) {
     console.log(results);
     res.json({ message: results });
   });
