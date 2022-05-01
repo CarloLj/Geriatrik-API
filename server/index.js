@@ -13,6 +13,7 @@ const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
 
 var mysql = require("mysql");
+const { param } = require("express/lib/request");
 
 var con = mysql.createConnection({
   host: "localhost",
@@ -120,9 +121,10 @@ getUser = function (email){
 
 getTamizaje = function (pacienteID){
   return new Promise(function (resolve, reject) {
-    con.query("SELECT fecha, respuestasJSON, puntos, tipotamizaje.tipo from tamizaje INNER JOIN tipotamizaje where tipotamizaje.tipoID = tipoTamizaje and pacienteID = '" + pacienteID+"';",
-      function (err, results) {
+    con.query("SELECT tamizajeID, fecha, respuestasJSON, puntos, notas, tipotamizaje.tipo from tamizaje INNER JOIN tipotamizaje where tipotamizaje.tipoID = tipoTamizaje and pacienteID = '" + pacienteID+"';",
+      function (err, rows) {
         if (err) throw err;
+        results = Object.values(JSON.parse(JSON.stringify(rows)));
         resolve(results);
       }
     )
@@ -276,10 +278,10 @@ app.get("/patients", (req, res) => {
   });
 });
 
-app.get("/tamizaje", (req, res) => {
-  const {pacienteID} = req.body;
-  console.log(pacienteID);
-  getTamizaje(pacienteID).then(function (results) {
+app.get("/tamizaje/:pacienteID", (req, res) => {
+  // const {pacienteID} = req.body;
+  console.log(req.params.pacienteID);
+  getTamizaje(req.params.pacienteID).then(function (results) {
     console.log(results);
     res.json({ message: results });
   });
