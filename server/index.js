@@ -38,6 +38,17 @@ getPatients = function () {
   });
 };
 
+getPatient = function (id) {
+  return new Promise(function (resolve, reject) {
+    con.query("SELECT * FROM paciente WHERE pacienteID = " + id, function (err, rows) {
+      if (err) throw err;
+      var results = Object.values(JSON.parse(JSON.stringify(rows)));
+      console.log(results)
+      resolve(results);
+    });
+  });
+};
+
 addPatient = function (
   nombre,
   apellidoP,
@@ -282,6 +293,20 @@ app.get("/tamizaje/:pacienteID", (req, res) => {
   // const {pacienteID} = req.body;
   console.log(req.params.pacienteID);
   getTamizaje(req.params.pacienteID).then(function (results) {
+    console.log(results);
+    res.json({ message: results });
+  });
+});
+
+/**
+ * @swagger
+ * /patient/{id}:
+ *  get:
+ *      summary: Retorna el usuario seleccionado con el id
+ *      tags: [Patient]
+ */
+ app.get("/patient/:id", (req, res) => {
+  getPatient(req.params.id).then(function (results) {
     console.log(results);
     res.json({ message: results });
   });
