@@ -386,7 +386,8 @@ app.post("/register", async (req,res) => {
  */
 
 app.post("/login", (req, res) => {
-  const {email,cont} = req.body;
+  const {email,password} = req.body;
+
   try {
     //find user by email
     getUser(email).then(async function (results){
@@ -394,10 +395,10 @@ app.post("/login", (req, res) => {
       if(results.length != 0){
 
         //checks if passwords match 
-        const isMatch = await bcrypt.compare(cont,results[0]["password"]);
+        const isMatch = await bcrypt.compare(password,results[0]["password"]);
 
         if(!isMatch){
-          res.status(400).json({msg: 'Invalid Credentials'});
+          return res.status(400).json({msg: 'Invalid Credentials'});
         }
         
         //payload to send in jwt
@@ -424,7 +425,7 @@ app.post("/login", (req, res) => {
             res.json(User);
         });        
       }else{
-        res.json({message: "User does not exist"});
+        return res.status(400).json({msg: 'Invalid Credentials'});
       }
     })
   } catch (error) {
