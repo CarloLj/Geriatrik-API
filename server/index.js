@@ -451,7 +451,7 @@ addMoca = function (props) {
   const {tipoTamizaje, empleadoId, pacienteId, fecha, respuestasJSON, puntos} = props;
 
   return new Promise(function (resolve, reject) {
-    con.query("INSERT INTO tamizaje VALUES (" + null + ", " + tipoTamizaje + ", " + empleadoId + ", " + pacienteId + ", " + "'" + fecha + "'" + ", " + "'" + respuestasJSON + "'" + ", " + puntos + ");",
+    con.query("INSERT INTO tamizaje VALUES (" + null + ", " + tipoTamizaje + ", " + empleadoId + ", " + pacienteId + ", " + "'" + fecha + "'" + ", " + "'" + respuestasJSON + "'" + ", " + puntos + "," + "notas" + ");",
       function (err, rows, fields) {
         if (err) throw err;
         results = Object.values(JSON.parse(JSON.stringify(rows)));
