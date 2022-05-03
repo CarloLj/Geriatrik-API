@@ -117,6 +117,20 @@ getUser = function (email){
   });
 };
 
+addMoca = function (props) {
+  const {tipoTamizaje, empleadoId, pacienteId, fecha, respuestasJSON, puntos} = props;
+
+  return new Promise(function (resolve, reject) {
+    con.query("INSERT INTO tamizaje VALUES (" + null + ", " + tipoTamizaje + ", " + empleadoId + ", " + pacienteId + ", " + "'" + fecha + "'" + ", " + "'" + respuestasJSON + "'" + ", " + puntos + ");",
+      function (err, rows, fields) {
+        if (err) throw err;
+        results = Object.values(JSON.parse(JSON.stringify(rows)));
+        resolve(results);
+      }
+    );
+  });
+};
+
 const swaggerSpec = {
   definition: {
     openapi: "3.0.0",
@@ -372,4 +386,18 @@ app.post("/login", (req, res) => {
   } catch (error) {
     res.status(500).send('Server error');
   }
+});
+
+/**
+ * @swagger
+ * /moca:
+ *  post:
+ *      summary: Guarda los resultados del moca en la bd 
+ *      tags: [Moca]
+ */
+app.post("/moca", (req, res) => {
+  addMoca(req.body).then(function (results) {
+    console.log(results);
+    res.json({ message: results });
+  });
 });
