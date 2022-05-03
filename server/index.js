@@ -97,7 +97,7 @@ addPatient = function (
   });
 };
 
-addEmployee = function (nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont){
+addEmployee = function (nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont,pfp){
   return new Promise(function (resolve, reject) {
     con.query("INSERT INTO empleado (nombre,apellidoP,apellidoM,fechaNac,tipoEmpleado,sexo,cedula,email,password,imagenPerfil)"+
       "SELECT * FROM (SELECT '"+
@@ -109,7 +109,7 @@ addEmployee = function (nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,em
       sexo+"', '"+
       cedula+"', '"+
       email+"', '"+
-      cont+"','none')"+
+      cont+"','"+pfp+"')"+
       "as tmp WHERE NOT EXISTS ( SELECT email FROM empleado WHERE email = '" +email+ "') LIMIT 1",
       function (err, results) {
         if (err) throw err;
@@ -330,15 +330,15 @@ app.post("/addPatient", (req, res) => {
 
 app.post("/register", async (req,res) => {
   //destructure body
-  const {nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,cont} = req.body;
+  const {name, lastnameP,lastnameM,date,type,sex,cedula,email,password,pfp} = req.body;
   
   try {
     //password hashing
     const salt = await bcrypt.genSalt(10); 
-    password = await bcrypt.hash(cont,salt);
+    cont = await bcrypt.hash(password,salt);
 
     //insert query
-    addEmployee(nombre, apellidoP,apellidoM,fechaNac,tipo,sexo,cedula,email,password).then(function (results){
+    addEmployee(name, lastnameP,lastnameM,date,type,sex,cedula,email,cont,pfp).then(function (results){
       
       //if insert query was successfull
       if(results["affectedRows"] != 0){
@@ -360,7 +360,7 @@ app.post("/register", async (req,res) => {
             getUser(email).then(function(results){
               const User = {
                 empleadoID: results[0]["empleadoID"],
-                name: nombre,
+                name: name,
                 token: token
               }
               //return user data and access token
@@ -368,7 +368,7 @@ app.post("/register", async (req,res) => {
             });
         });
       }else{
-        res.json({message: "User already exists"});
+        return res.status(400).json({msg: 'User already exists'});
       }
     });
   } catch (error) {
