@@ -2,6 +2,9 @@
 // server-index.js
 const express = require("express");
 
+//middleware to protect request
+const auth = require('../middleware/auth');
+
 const PORT = process.env.PORT || 3001;
 
 const fs = require("fs");
@@ -261,7 +264,7 @@ app.get("/api-info", (req, res) => {
  *      summary: Retorna la lista de la base de datos de pacientes en el servidor
  *      tags: [Patient]
  */
-app.get("/patients", (req, res) => {
+app.get("/patients",auth ,(req, res) => {
   getPatients().then(function (results) {
     console.log(results);
     res.json({ message: results });
