@@ -50,44 +50,23 @@ getPatient = function (id) {
 };
 
 addPatient = function (
-  nombre,
-  apellidoP,
-  apellidoM,
-  fechaNac,
-  sexo,
-  escolaridad,
-  discapacidades,
-  queja_memoria,
-  hipoacusia_severa,
-  contactoEmergencia,
-  imagenPerfil
+  name, lastName, motherLastName, birthday, gender, scholarity, disabilities, memoryComplaint, severeHearingLoss, emergencyContact, image
 ) {
   return new Promise(function (resolve, reject) {
     con.query(
-      "INSERT INTO * Paciente VALUES (" +
-        nombre +
-        ", " +
-        apellidoP +
-        ", " +
-        apellidoM +
-        ", " +
-        fechaNac +
-        ", " +
-        sexo +
-        ", " +
-        escolaridad +
-        ", " +
-        discapacidades +
-        ", " +
-        ", " +
-        queja_memoria +
-        ", " +
-        hipoacusia_severa +
-        ", " +
-        contactoEmergencia +
-        ", " +
-        imagenPerfil +
-        "",
+      "INSERT INTO paciente (nombre, apellidoP, apellidoM, fechaNac, sexo, escolaridad, discapacidades, queja_memoria, hipoacusia_severa, contactoEmergencia, imagenPerfil) VALUES ('" +
+        name +"', '"+
+        lastName +"', '"+
+        motherLastName +"', '"+
+        birthday +"', '"+
+        gender +"', '"+
+        scholarity +"', '"+
+        disabilities +"', "+
+        memoryComplaint +", "+
+        severeHearingLoss +", '"+
+        emergencyContact +"', '"+
+        image +
+        "')",
       function (err, rows, fields) {
         if (err) throw err;
         results = Object.values(JSON.parse(JSON.stringify(rows)));
@@ -314,9 +293,14 @@ app.get("/tamizaje/:pacienteID", (req, res) => {
 
 //CREATE
 app.post("/addPatient", (req, res) => {
-  addPatient().then(function (results) {
+  const {name, lastName, motherLastName, birthday, gender, scholarity, disabilities, memoryComplaint, severeHearingLoss, emergencyContact, image} = req.body;
+
+  console.log(req.body);
+
+  addPatient(name, lastName, motherLastName, birthday, gender, scholarity, disabilities, memoryComplaint, severeHearingLoss, emergencyContact, image).then(function (results) {
     console.log(results);
     res.json({ message: results });
+    
   });
 });
 
