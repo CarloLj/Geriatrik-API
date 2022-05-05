@@ -23,7 +23,7 @@ var con = mysql.createConnection({
   user: "root",
   password: "",
   database: "geriatrik",
-  port: 3308
+  port: 3306
 });
 
 con.connect(function (err) {
@@ -254,11 +254,38 @@ app.listen(PORT, () => {
  *              imagenPerfil:
  *                  type: string
  *                  description: Apellido materno del empleado
+ *      Tamizaje:
+ *        type: object
+ *        properties:
+ *                tamizajeID:
+ *                      type: int
+ *                      description: Identificador unico del tamizaje
+ *                tipoTamizaje:
+ *                      type: int
+ *                      description: Tipo de tamizaje (0 = MOCA)
+ *                empleadoID:
+ *                      type: int
+ *                      description: Empleado que esta aplicando el tamizaje
+ *                pacienteID:
+ *                      type: int
+ *                      description: Paciente que esta haciendo el tamizaje
+ *                fecha:
+ *                      type: date
+ *                      description: Fecha cuando se aplicó el tamizaje
+ *                respuestasJSON:
+ *                      type: string
+ *                      description: Respuestas en formato JSON del tamizaje
+ *                puntos:
+ *                      type: int
+ *                      description: puntos totales del tamizaje
+ *                notas:
+ *                      type: string
+ *                      description: Notas del tamizaje
  */
 
 /**
  * @swagger
- * /api:
+ * /api-info:
  *  get:
  *      tags:
  *        - "Api"
@@ -282,6 +309,13 @@ app.get("/patients",auth ,(req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /tamizaje/{pacienteID}:
+ *  get:
+ *      summary: Retorna la lista de los MOCA del paciente indicado con pacienteID
+ *      tags: [Moca]
+ */
 app.get("/tamizaje/:pacienteID",auth, (req, res) => {
   // const {pacienteID} = req.body;
   console.log(req.params.pacienteID);
@@ -319,7 +353,13 @@ app.get("/tamizaje/:pacienteID",auth, (req, res) => {
   });
 });
 
-//CREATE
+/**
+ * @swagger
+ * /addPatient:
+ *  post:
+ *      summary: Agreaga un nuevo paciente en la base de datos y retorna el resultado
+ *      tags: [Patient]
+ */
 app.post("/addPatient", auth,(req, res) => {
   const {name, lastName, motherLastName, birthday, gender, scholarity, disabilities, memoryComplaint, severeHearingLoss, emergencyContact, image} = req.body;
 
@@ -337,9 +377,8 @@ app.post("/addPatient", auth,(req, res) => {
  * /register:
  *  post:
  *      summary: Ingresa datos del empleado en la BD y retorna su nombre, ID y token de acceso
- *      tags: [Employee]
+ *      tags: [Empleado]
  */
-
 app.post("/register", async (req,res) => {
   //destructure body
   const {name, lastnameP,lastnameM,date,type,sex,cedula,email,password,pfp} = req.body;
@@ -394,7 +433,7 @@ app.post("/register", async (req,res) => {
  * /login:
  *  post:
  *      summary: Revisa las credenciales del usuario y retorna su ID, nombre y token de acceso
- *      tags: [Employee]
+ *      tags: [Empleado]
  */
 
 app.post("/login", (req, res) => {
