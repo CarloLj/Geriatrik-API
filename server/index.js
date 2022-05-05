@@ -271,7 +271,7 @@ app.get("/patients",auth ,(req, res) => {
   });
 });
 
-app.get("/tamizaje/:pacienteID", (req, res) => {
+app.get("/tamizaje/:pacienteID",auth, (req, res) => {
   // const {pacienteID} = req.body;
   console.log(req.params.pacienteID);
   getTamizaje(req.params.pacienteID).then(function (results) {
@@ -287,7 +287,7 @@ app.get("/tamizaje/:pacienteID", (req, res) => {
  *      summary: Retorna el usuario seleccionado con el id
  *      tags: [Patient]
  */
- app.get("/patient/:id", (req, res) => {
+ app.get("/patient/:id", auth,(req, res) => {
   getPatient(req.params.id).then(function (results) {
     console.log(results);
     res.json({ message: results });
@@ -427,7 +427,7 @@ app.post("/login", (req, res) => {
  *      summary: Guarda los resultados del moca en la bd 
  *      tags: [Moca]
  */
-app.post("/moca", (req, res) => {
+app.post("/moca", auth,(req, res) => {
   addMoca(req.body).then(function (results) {
     console.log(results);
     res.json({ message: results });
