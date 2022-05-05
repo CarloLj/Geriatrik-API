@@ -23,7 +23,7 @@ var con = mysql.createConnection({
   user: "root",
   password: "",
   database: "geriatrik",
-  port: 3306
+  port: 3308
 });
 
 con.connect(function (err) {
@@ -44,6 +44,17 @@ getPatients = function () {
 getPatient = function (id) {
   return new Promise(function (resolve, reject) {
     con.query("SELECT * FROM paciente WHERE pacienteID = " + id, function (err, rows) {
+      if (err) throw err;
+      var results = Object.values(JSON.parse(JSON.stringify(rows)));
+      console.log(results)
+      resolve(results);
+    });
+  });
+};
+
+getProfile = function (id) {
+  return new Promise(function (resolve, reject) {
+    con.query("SELECT * FROM empleado WHERE empleadoID = " + id, function (err, rows) {
       if (err) throw err;
       var results = Object.values(JSON.parse(JSON.stringify(rows)));
       console.log(results)
@@ -289,6 +300,20 @@ app.get("/tamizaje/:pacienteID",auth, (req, res) => {
  */
  app.get("/patient/:id", auth,(req, res) => {
   getPatient(req.params.id).then(function (results) {
+    console.log(results);
+    res.json({ message: results });
+  });
+});
+
+/**
+ * @swagger
+ * /profile/{id}:
+ *  get:
+ *      summary: Retorna el empleado seleccionado con el id
+ *      tags: [Empleado]
+ */
+ app.get("/profile/:id", auth,(req, res) => {
+  getProfile(req.params.id).then(function (results) {
     console.log(results);
     res.json({ message: results });
   });
