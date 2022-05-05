@@ -2,6 +2,9 @@
 // server-index.js
 const express = require("express");
 
+//middleware to protect request
+const auth = require('../middleware/auth');
+
 const PORT = process.env.PORT || 3001;
 
 const fs = require("fs");
@@ -261,14 +264,14 @@ app.get("/api-info", (req, res) => {
  *      summary: Retorna la lista de la base de datos de pacientes en el servidor
  *      tags: [Patient]
  */
-app.get("/patients", (req, res) => {
+app.get("/patients",auth ,(req, res) => {
   getPatients().then(function (results) {
     console.log(results);
     res.json({ message: results });
   });
 });
 
-app.get("/tamizaje/:pacienteID", (req, res) => {
+app.get("/tamizaje/:pacienteID",auth, (req, res) => {
   // const {pacienteID} = req.body;
   console.log(req.params.pacienteID);
   getTamizaje(req.params.pacienteID).then(function (results) {
@@ -284,7 +287,7 @@ app.get("/tamizaje/:pacienteID", (req, res) => {
  *      summary: Retorna el usuario seleccionado con el id
  *      tags: [Patient]
  */
- app.get("/patient/:id", (req, res) => {
+ app.get("/patient/:id", auth,(req, res) => {
   getPatient(req.params.id).then(function (results) {
     console.log(results);
     res.json({ message: results });
@@ -292,7 +295,7 @@ app.get("/tamizaje/:pacienteID", (req, res) => {
 });
 
 //CREATE
-app.post("/addPatient", (req, res) => {
+app.post("/addPatient", auth,(req, res) => {
   const {name, lastName, motherLastName, birthday, gender, scholarity, disabilities, memoryComplaint, severeHearingLoss, emergencyContact, image} = req.body;
 
   console.log(req.body);
@@ -424,7 +427,7 @@ app.post("/login", (req, res) => {
  *      summary: Guarda los resultados del moca en la bd 
  *      tags: [Moca]
  */
-app.post("/moca", (req, res) => {
+app.post("/moca", auth,(req, res) => {
   addMoca(req.body).then(function (results) {
     console.log(results);
     res.json({ message: results });
