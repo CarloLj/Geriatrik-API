@@ -295,7 +295,7 @@ app.get("/tamizaje/:pacienteID",auth, (req, res) => {
 });
 
 //CREATE
-app.post("/addPatient", (req, res) => {
+app.post("/addPatient", auth,(req, res) => {
   const {name, lastName, motherLastName, birthday, gender, scholarity, disabilities, memoryComplaint, severeHearingLoss, emergencyContact, image} = req.body;
 
   console.log(req.body);
