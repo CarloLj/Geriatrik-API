@@ -18,7 +18,7 @@ const swaggerJsDoc = require("swagger-jsdoc");
 var mysql = require("mysql");
 const { param } = require("express/lib/request");
 
-var con = mysql.createConnection({
+var con = mysql.createPool({
   host: "us-cdbr-east-05.cleardb.net",
   user: "be6780e968dfb0",
   password: "7935393c",
