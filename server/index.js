@@ -17,12 +17,12 @@ const swaggerJsDoc = require("swagger-jsdoc");
 
 var mysql = require("mysql");
 const { param } = require("express/lib/request");
-mysql://b239e6a6f6b7d2:18585680@us-cdbr-east-05.cleardb.net/heroku_1291a8df9abe167?reconnect=true
-var con = mysql.createConnection({
+
+var con = mysql.createPool({
   host: "us-cdbr-east-05.cleardb.net",
   user: "b239e6a6f6b7d2",
   password: "18585680",
-  database: "heroku_1291a8df9abe167?reconnect=true",
+  database: "heroku_1291a8df9abe167",
   
 });
 
