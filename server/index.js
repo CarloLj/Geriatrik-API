@@ -19,11 +19,10 @@ var mysql = require("mysql");
 const { param } = require("express/lib/request");
 
 var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "geriatrik",
-  port: 3306
+  host: "us-cdbr-east-05.cleardb.net",
+  user: "be6780e968dfb0",
+  password: "7935393c",
+  database: "heroku_a450e4e4cca4a2f",
 });
 
 con.connect(function (err) {
@@ -171,7 +170,7 @@ app.use(
   swaggerUI.setup(swaggerJsDoc(swaggerSpec))
 );
 
-app.listen(PORT, () => {
+app.listen(process.env.PORT || PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 
